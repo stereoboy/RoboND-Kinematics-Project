@@ -145,7 +145,7 @@ theta6 = atan2(-T3_G[1,1], T3_G[1,0])
 #### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results. 
 
 
-I have already explained my implementation in detail in the previous section. Only one different thing from the guide from the lectures is using transpose matrix instead of using inverse operation when calculating transformation matrix from link 3 to gripper link. The other code line are just same as the lecture guide. 
+I have already explained my implementation in detail in the previous section. Only one different thing from the guide from the lectures is using transpose matrix instead of using inverse operation when calculating transformation matrix from link 3 to gripper link. The correctness of `inv('LU')` is not good enough. The other code line are just same as the lecture's guide. 
 
 In my opinion using DH convention is a little problematic. Since URDF does not use DH description, we need to set up additional DH table and effort to calculate some rotations. Even though DH convention is very convenient when I study robotics tradition, I need to know another representations for the kinematics.
 

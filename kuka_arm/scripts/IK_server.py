@@ -61,6 +61,16 @@ def build_mat(alpha, a, d, q):
                     [ sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d],
                     [                  0,                  0,           0,             1]])
 
+#
+# Matrix
+#
+
+# initialize
+q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
+d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8')
+a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
+alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')
+
 # Create Modified DH parameters
 S = {
     alpha0 : 0.00,   a0 : 0.00,   d1 : (0.33 + 0.42),
@@ -71,15 +81,6 @@ S = {
     alpha5 : -pi/2., a5 : 0.00,   d6 : 0.00,
     alpha6 : 0.00,   a6 : 0.00,   d7 : (0.193 + 0.11),  q7 : 0.00,
 }
-
-#
-# Matrix
-#
-q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
-d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8')
-a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
-alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')
-
 
 T0_1 = build_mat(alpha0, a0, d1, q1).subs(S)
 T1_2 = build_mat(alpha1, a1, d2, q2).subs(S)
@@ -189,11 +190,9 @@ def handle_calculate_IK(req):
             print ("\nB %04.4f seconds" % (time()-start_time))
 
             ## Inverse Orientation
-            T3_G_ = (T0_3_.transpose())*Rrpy_
+            T3_G_ = (T0_3_.transpose())*Rrpy_ # use transpose() instead of inv('LU') for performance and accuracy
             #print('TEST', ((T0_3_[0:3,0:3]).inv())*T0_3_[0:3,0:3])
             #print('TEST', ((T0_3_[0:3,0:3]).transpose())*T0_3_[0:3,0:3])
-            #print('T3_G', T3_G)
-            #print('T3_G_', T3_G_)
 
             # using only Rotation
             # https://classroom.udacity.com/nanodegrees/nd209/parts/7b2fd2d7-e181-401e-977a-6158c77bf816/modules/8855de3f-2897-46c3-a805-628b5ecf045b/lessons/87c52cd9-09ba-4414-bc30-24ae18277d24/concepts/a124f98b-1ed5-45f5-b8eb-6c40958c1a6b
@@ -202,14 +201,6 @@ def handle_calculate_IK(req):
             theta6 = atan2(-T3_G_[1,1], T3_G_[1,0])
             print ("\nC %04.4f seconds" % (time()-start_time))
             #print('T3_G_2', T3_G.evalf(subs={q4:theta4, q5:theta5, q6:theta6}))
-
-#            print('====================')
-#            print(float(theta1))
-#            print(float(theta2))
-#            print(float(theta3))
-#            print(float(theta4))
-#            print(float(theta5))
-#            print(float(theta6))
 
             FK = T0_G.evalf(subs={q1:theta1, q2:theta2, q3:theta3, q4:theta4, q5:theta5, q6:theta6})
             ee = [FK[0,3],FK[1,3],FK[2,3]]

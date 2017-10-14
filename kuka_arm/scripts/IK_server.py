@@ -61,14 +61,7 @@ def build_mat(alpha, a, d, q):
                     [ sin(q)*sin(alpha), cos(q)*sin(alpha),  cos(alpha),  cos(alpha)*d],
                     [                  0,                  0,           0,             1]])
 
-#
-# Matrix
-#
-q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
-d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8')
-a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
-alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')
-
+# Create Modified DH parameters
 S = {
     alpha0 : 0.00,   a0 : 0.00,   d1 : (0.33 + 0.42),
     alpha1 : -pi/2., a1 : 0.35,   d2 : 0.00,            q2 : q2 - pi/2,
@@ -78,6 +71,15 @@ S = {
     alpha5 : -pi/2., a5 : 0.00,   d6 : 0.00,
     alpha6 : 0.00,   a6 : 0.00,   d7 : (0.193 + 0.11),  q7 : 0.00,
 }
+
+#
+# Matrix
+#
+q1, q2, q3, q4, q5, q6, q7 = symbols('q1:8')
+d1, d2, d3, d4, d5, d6, d7 = symbols('d1:8')
+a0, a1, a2, a3, a4, a5, a6 = symbols('a0:7')
+alpha0, alpha1, alpha2, alpha3, alpha4, alpha5, alpha6 = symbols('alpha0:7')
+
 
 T0_1 = build_mat(alpha0, a0, d1, q1).subs(S)
 T1_2 = build_mat(alpha1, a1, d2, q2).subs(S)
@@ -103,13 +105,6 @@ p = symbols('p')
 y = symbols('y')
 
 Rrpy = rot_z(y)*rot_y(p)*rot_x(r)
-
-#    print("====================================")
-#    print(T0_3)
-#    print("====================================")
-#    print(T3_G)
-
-
 
 def handle_calculate_IK(req):
     rospy.loginfo("Received %s eef-poses from the plan" % len(req.poses))
@@ -163,6 +158,7 @@ def handle_calculate_IK(req):
             ###
 
             start_time = time()
+
             ## Calculate WC
             Rrpy_ = (Rrpy*R_corr).evalf(subs={r:roll, p:pitch, y:yaw})
             nx = Rrpy_[0,2]
@@ -173,8 +169,9 @@ def handle_calculate_IK(req):
             wx = px - (S[d7])*nx
             wy = py - (S[d7])*ny
             wz = pz - (S[d7])*nz
-
+            
             print ("\nA %04.4f seconds" % (time()-start_time))
+
             sideA = sqrt(pow(S[d4], 2) + pow(S[a3], 2))
             sideB = sqrt(pow(sqrt(pow(wx, 2) + pow(wy, 2)) - S[a1], 2)  + pow(wz - S[d1], 2))
             sideC = S[a2]
@@ -190,13 +187,13 @@ def handle_calculate_IK(req):
             T0_3_ = T0_3.evalf(subs={q1:theta1, q2:theta2, q3:theta3})
 
             print ("\nB %04.4f seconds" % (time()-start_time))
+
             ## Inverse Orientation
             T3_G_ = (T0_3_.transpose())*Rrpy_
             #print('TEST', ((T0_3_[0:3,0:3]).inv())*T0_3_[0:3,0:3])
             #print('TEST', ((T0_3_[0:3,0:3]).transpose())*T0_3_[0:3,0:3])
             #print('T3_G', T3_G)
             #print('T3_G_', T3_G_)
-#    print((T3_G_[1,3] - 1.5)/0.303) 
 
             # using only Rotation
             # https://classroom.udacity.com/nanodegrees/nd209/parts/7b2fd2d7-e181-401e-977a-6158c77bf816/modules/8855de3f-2897-46c3-a805-628b5ecf045b/lessons/87c52cd9-09ba-4414-bc30-24ae18277d24/concepts/a124f98b-1ed5-45f5-b8eb-6c40958c1a6b
